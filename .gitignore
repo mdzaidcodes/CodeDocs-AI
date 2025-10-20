@@ -1,0 +1,471 @@
+# ============================================================================
+# CodeDocs AI - Root .gitignore
+# ============================================================================
+# This file prevents sensitive and generated files from being committed to Git
+# Covers both frontend (Next.js) and backend (Flask/Python)
+# ============================================================================
+
+# ============================================================================
+# ENVIRONMENT VARIABLES & SECRETS (CRITICAL - NEVER COMMIT)
+# ============================================================================
+# These files contain sensitive credentials and API keys
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# Backend environment file
+backend/.env
+backend/.env.local
+
+# Frontend environment file
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+
+
+# ============================================================================
+# OPERATING SYSTEM FILES
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+
+# ============================================================================
+# FRONTEND (Next.js / Node.js) - /frontend/
+# ============================================================================
+
+# Dependencies
+frontend/node_modules/
+frontend/package-lock.json
+frontend/yarn.lock
+frontend/pnpm-lock.yaml
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+
+# Next.js cache
+frontend/.next/cache/
+
+# TypeScript cache
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Vercel deployment
+frontend/.vercel
+
+# Production build
+frontend/.cache/
+
+# Testing coverage
+frontend/coverage/
+frontend/.nyc_output/
+
+# Debug logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# Misc
+frontend/.DS_Store
+frontend/.pnp
+frontend/.pnp.js
+
+
+# ============================================================================
+# BACKEND (Flask / Python) - /backend/
+# ============================================================================
+
+# Python bytecode
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/**/*.py[cod]
+backend/**/*$py.class
+
+# Python virtual environments
+backend/venv/
+backend/env/
+backend/ENV/
+backend/.venv/
+backend/virtualenv/
+
+# Distribution / packaging
+backend/dist/
+backend/build/
+backend/develop-eggs/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
+
+# PyInstaller
+backend/*.manifest
+backend/*.spec
+
+# Unit test / coverage
+backend/.pytest_cache/
+backend/.coverage
+backend/.coverage.*
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.hypothesis/
+backend/pytestdebug.log
+backend/coverage.xml
+backend/*.cover
+backend/*.py,cover
+
+# Flask instance folder
+backend/instance/
+backend/.webassets-cache
+
+# Scrapy
+backend/.scrapy
+
+# Sphinx documentation
+backend/docs/_build/
+backend/docs/_static/
+backend/docs/_templates/
+
+# Jupyter Notebook
+backend/.ipynb_checkpoints
+
+# IPython
+backend/profile_default/
+backend/ipython_config.py
+
+# pyenv
+backend/.python-version
+
+# Celery
+backend/celerybeat-schedule
+backend/celerybeat.pid
+
+# SageMath
+backend/*.sage.py
+
+# Spyder project settings
+backend/.spyderproject
+backend/.spyproject
+
+# Rope project settings
+backend/.ropeproject
+
+# mkdocs documentation
+backend/site
+
+# mypy type checking
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+
+# Pyre type checker
+backend/.pyre/
+
+# pytype static type analyzer
+backend/.pytype/
+
+# Cython debug symbols
+backend/cython_debug/
+
+
+# ============================================================================
+# TEMPORARY FILES & UPLOADS
+# ============================================================================
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Upload directories (local development)
+backend/uploads/
+backend/temp/
+frontend/uploads/
+frontend/temp/
+
+# Log files
+*.log
+logs/
+backend/*.log
+frontend/*.log
+
+
+# ============================================================================
+# IDE & EDITOR FILES
+# ============================================================================
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs (PyCharm, WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime_metrics
+*.sublime_session
+sftp-config.json
+sftp-config-alt*.json
+Package Control.last-run
+Package Control.ca-list
+Package Control.ca-bundle
+Package Control.system-ca-bundle
+Package Control.cache/
+Package Control.ca-certs/
+Package Control.merged-ca-bundle
+Package Control.user-ca-bundle
+oscrypto-ca-bundle.crt
+bh_unicode_properties.cache
+GitHub.sublime-settings
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+tags
+[._]*.un~
+
+# Emacs
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+.org-id-locations
+*_archive
+*_flymake.*
+/eshell/history
+/eshell/lastdir
+/elpa/
+*.rel
+/auto/
+.cask/
+flycheck_*.el
+/server/
+
+
+# ============================================================================
+# DATABASE FILES (Local Development)
+# ============================================================================
+
+# SQLite databases (if used for local testing)
+*.sqlite
+*.sqlite3
+*.db
+
+# PostgreSQL dumps
+*.sql
+*.dump
+
+
+# ============================================================================
+# DOCKER (if using Docker)
+# ============================================================================
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+
+# ============================================================================
+# CI/CD & DEPLOYMENT
+# ============================================================================
+
+# GitHub Actions
+.github/workflows/*.log
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# AWS
+.aws/
+
+
+# ============================================================================
+# SECURITY & CERTIFICATES
+# ============================================================================
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+
+
+# ============================================================================
+# DOCUMENTATION (Generated)
+# ============================================================================
+
+# Generated documentation (keep source docs)
+/docs/build/
+/docs/_build/
+
+
+# ============================================================================
+# BACKUP FILES
+# ============================================================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*-backup
+*-old
+
+
+# ============================================================================
+# COMPRESSED FILES (unless intentionally added)
+# ============================================================================
+
+# Archives (usually shouldn't be in repo)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+
+# ============================================================================
+# PROJECT-SPECIFIC
+# ============================================================================
+
+# Local configuration overrides
+config.local.js
+config.local.json
+
+# User-specific files
+.user
+*.user
+
+# Cache directories
+.cache/
+cache/
+
+# Local history
+.history/
+
+# macOS Finder attributes
+.fseventsd/
+.Spotlight-V100/
+
+
+# ============================================================================
+# NOTES FOR DEVELOPERS
+# ============================================================================
+#
+# This .gitignore covers:
+# - Frontend: Next.js, Node.js, npm/yarn
+# - Backend: Flask, Python, pip/venv
+# - Development: VS Code, PyCharm, Sublime, Vim, etc.
+# - Deployment: Vercel, AWS, Docker
+# - OS: macOS, Windows, Linux
+# - Security: .env files, SSL certs, API keys
+#
+# IMPORTANT FILES TO KEEP TRACK OF:
+# ✓ .env.sample (template for .env - COMMIT THIS)
+# ✓ .env.example (template for .env - COMMIT THIS)
+# ✗ .env (actual secrets - NEVER COMMIT)
+# ✗ .env.local (actual secrets - NEVER COMMIT)
+#
+# TO ADD EXCEPTIONS:
+# If you need to commit a file that matches a pattern above, use:
+# !path/to/specific/file
+#
+# Example:
+# !frontend/public/sample.env
+#
+# ============================================================================
+
+# END OF .gitignore

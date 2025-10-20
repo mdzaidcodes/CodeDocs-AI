@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/50 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/70;
+}
+
+/* Markdown documentation viewer styles */
+.markdown-viewer {
+  @apply bg-white text-gray-900 rounded-lg p-8 max-w-none prose prose-slate;
+}
+
+.markdown-viewer h1 {
+  @apply text-3xl font-bold mb-4 text-gray-900 border-b pb-2;
+}
+
+.markdown-viewer h2 {
+  @apply text-2xl font-semibold mb-3 mt-6 text-gray-800;
+}
+
+.markdown-viewer h3 {
+  @apply text-xl font-semibold mb-2 mt-4 text-gray-800;
+}
+
+.markdown-viewer p {
+  @apply mb-4 text-gray-700 leading-relaxed;
+}
+
+.markdown-viewer ul,
+.markdown-viewer ol {
+  @apply mb-4 ml-6 text-gray-700;
+}
+
+.markdown-viewer li {
+  @apply mb-2;
+}
+
+.markdown-viewer code {
+  @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono text-gray-800;
+}
+
+.markdown-viewer pre {
+  @apply bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto mb-4;
+}
+
+.markdown-viewer pre code {
+  @apply bg-transparent text-gray-100;
+}
+
+.markdown-viewer a {
+  @apply text-blue-600 hover:text-blue-800 underline;
+}
+
+.markdown-viewer blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic text-gray-600 my-4;
+}
+
+.markdown-viewer table {
+  @apply w-full border-collapse mb-4;
+}
+
+.markdown-viewer th,
+.markdown-viewer td {
+  @apply border border-gray-300 px-4 py-2 text-left;
+}
+
+.markdown-viewer th {
+  @apply bg-gray-100 font-semibold;
+}
+
+/* SweetAlert2 custom styling */
+.swal2-popup {
+  @apply rounded-lg;
+}
+
+.swal2-title {
+  @apply text-2xl;
+}
+
+.swal2-html-container {
+  @apply text-base;
+}
+
+/* Loading animation */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Heading highlight animation */
+@keyframes highlight-flash {
+  0% {
+    background-color: rgba(59, 130, 246, 0.3);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight-heading {
+  animation: highlight-flash 2s ease-out;
+  border-left: 4px solid rgb(59, 130, 246);
+  padding-left: 1rem;
+  margin-left: -1rem;
+}
+
+/* Better text wrapping */
+.break-words {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
