@@ -7,34 +7,45 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
-# Always use AWS Secrets Manager by default
-# Set USE_SECRETS_MANAGER=false to use local .env file instead
+# Check if we should use AWS Secrets Manager
 USE_SECRETS_MANAGER = os.environ.get('USE_SECRETS_MANAGER', 'true').lower() != 'false'
 
-if USE_SECRETS_MANAGER:
-    # Production: Load secrets from AWS Secrets Manager
-    print("🔐 Production mode: Loading configuration from AWS Secrets Manager...")
-    try:
-        from utils.secrets_manager import load_secrets_to_env
-        
-        # Get AWS region from environment or default to me-central-1
-        aws_region = os.environ.get('AWS_REGION', 'me-central-1')
-        secret_name = os.environ.get('SECRET_NAME', 'codedocs-ai')
-        
-        # Load secrets from AWS Secrets Manager
-        success = load_secrets_to_env(secret_name=secret_name, region_name=aws_region)
-        
-        if not success:
-            print("⚠️  Failed to load from Secrets Manager, attempting to use local .env")
+# Load secrets BEFORE defining Config class
+def _load_environment():
+    """Load environment variables from AWS Secrets Manager or .env file."""
+    if USE_SECRETS_MANAGER:
+        print("🔐 Production mode: Loading configuration from AWS Secrets Manager...")
+        try:
+            # Import here to avoid circular imports
+            import boto3
+            import json
+            
+            aws_region = os.environ.get('AWS_REGION', 'me-central-1')
+            secret_name = os.environ.get('SECRET_NAME', 'codedocs-ai')
+            
+            # Get secrets directly without importing utils.secrets_manager
+            client = boto3.client('secretsmanager', region_name=aws_region)
+            response = client.get_secret_value(SecretId=secret_name)
+            secrets = json.loads(response['SecretString'])
+            
+            # Set environment variables
+            for key, value in secrets.items():
+                os.environ[key] = str(value)
+            
+            print(f"✅ Successfully loaded {len(secrets)} secrets from AWS Secrets Manager")
+            return True
+        except Exception as e:
+            print(f"❌ Error loading from Secrets Manager: {e}")
+            print("⚠️  Falling back to local .env file")
             load_dotenv()
-    except Exception as e:
-        print(f"❌ Error loading from Secrets Manager: {e}")
-        print("⚠️  Falling back to local .env file")
+            return False
+    else:
+        print("🔧 Development mode: Loading configuration from .env file...")
         load_dotenv()
-else:
-    # Development: Load from .env file
-    print("🔧 Development mode: Loading configuration from .env file...")
-    load_dotenv()
+        return True
+
+# Load environment before defining Config
+_load_environment()
 
 
 class Config:
