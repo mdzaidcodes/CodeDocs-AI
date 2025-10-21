@@ -14,8 +14,8 @@ class ClaudeService:
         # Initialize Anthropic client with only API key
         self.client = Anthropic(
             api_key=Config.CLAUDE_API_KEY,
-            timeout=300.0,  # 5 minute timeout
-            max_retries=2
+            timeout=1800.0,  # 30 minute timeout
+            max_retries=3
         )
         self.model = Config.CLAUDE_MODEL
         self.max_tokens = Config.CLAUDE_MAX_TOKENS
