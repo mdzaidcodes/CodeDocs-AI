@@ -352,6 +352,10 @@ docker-compose.override.yml
 # GitHub Actions
 .github/workflows/*.log
 
+# Deployment scripts (contain production-specific config)
+backend/deploy-production.sh
+*.deploy.sh
+
 # Terraform
 *.tfstate
 *.tfstate.*

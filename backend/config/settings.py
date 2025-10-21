@@ -21,8 +21,8 @@ if USE_SECRETS_MANAGER:
     try:
         from utils.secrets_manager import load_secrets_to_env
         
-        # Get AWS region from environment or default to us-east-1
-        aws_region = os.environ.get('AWS_REGION', 'us-east-1')
+        # Get AWS region from environment or default to me-central-1
+        aws_region = os.environ.get('AWS_REGION', 'me-central-1')
         secret_name = os.environ.get('SECRET_NAME', 'codedocs-ai')
         
         # Load secrets from AWS Secrets Manager
