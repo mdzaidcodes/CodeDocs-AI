@@ -6,7 +6,6 @@ Handles PostgreSQL connection with pgvector extension for embeddings.
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
-from config.settings import Config
 
 
 def get_db_connection():
@@ -15,6 +14,9 @@ def get_db_connection():
     Returns a connection object with RealDictCursor for dict-like row access.
     Configured with 30 minute timeout for long-running operations.
     """
+    # Import Config here to avoid circular import
+    from config.settings import Config
+    
     try:
         conn = psycopg2.connect(
             Config.DATABASE_URL,
