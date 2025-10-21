@@ -81,6 +81,10 @@ def create_app():
     return app
 
 
+# Create app instance for Gunicorn
+app = create_app()
+
+
 def main():
     """
     Main entry point for the application.
@@ -108,9 +112,8 @@ def main():
         print(f"[FAILED] Database initialization failed: {e}")
         return
     
-    # Create Flask app
+    # Use the global app instance
     print("\n[3/3] Starting Flask application...")
-    app = create_app()
     
     print("\n" + "=" * 60)
     print("[SUCCESS] Server ready!")
