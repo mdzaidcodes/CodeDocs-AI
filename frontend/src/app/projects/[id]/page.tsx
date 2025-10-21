@@ -31,6 +31,7 @@ export default function ProjectDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [securityLoading, setSecurityLoading] = useState(true); // Start with true
   const [improvementsLoading, setImprovementsLoading] = useState(true); // Start with true
+  const [embeddingsReady, setEmbeddingsReady] = useState(false); // Start with false
   const [securityNotificationShown, setSecurityNotificationShown] = useState(false);
   const [improvementsNotificationShown, setImprovementsNotificationShown] = useState(false);
 
@@ -53,11 +54,11 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     if (!project || project.status !== 'completed') return;
 
-    // Check if security/improvements are still being processed
+    // Check if security/improvements/embeddings are still being processed
     const hasSecurityData = securityFindings.length > 0;
     const hasImprovementsData = improvements.length > 0;
     
-    if (hasSecurityData && hasImprovementsData) {
+    if (hasSecurityData && hasImprovementsData && embeddingsReady) {
       // Everything loaded
       return;
     }
@@ -148,8 +149,16 @@ export default function ProjectDetailPage() {
           }
         }
 
-        // Stop polling if both are loaded
-        if (securityFindings.length > 0 && improvements.length > 0) {
+        // Check if embeddings (chat) are ready
+        if (!embeddingsReady && progress_stage) {
+          // Check if progress_stage contains "Chat ready" or "All analysis complete"
+          if (progress_stage.includes('Chat ready') || progress_stage.includes('All analysis complete')) {
+            setEmbeddingsReady(true);
+          }
+        }
+
+        // Stop polling if everything is loaded
+        if (securityFindings.length > 0 && improvements.length > 0 && embeddingsReady) {
           clearInterval(pollInterval);
         }
       } catch (error) {
@@ -159,7 +168,7 @@ export default function ProjectDetailPage() {
 
     // Cleanup
     return () => clearInterval(pollInterval);
-  }, [project, projectId, securityFindings, improvements, securityNotificationShown, improvementsNotificationShown]);
+  }, [project, projectId, securityFindings, improvements, embeddingsReady, securityNotificationShown, improvementsNotificationShown]);
 
   /**
    * Fetch all project data
@@ -380,7 +389,10 @@ export default function ProjectDetailPage() {
             </TabsContent>
 
             <TabsContent value="chat">
-              <ChatTab projectId={projectId} />
+              <ChatTab 
+                projectId={projectId} 
+                isEmbeddingsReady={embeddingsReady}
+              />
             </TabsContent>
           </div>
         </Tabs>

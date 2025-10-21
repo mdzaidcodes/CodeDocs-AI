@@ -36,18 +36,26 @@ project_bp = Blueprint('projects', __name__, url_prefix='/api/projects')
 def process_project_async(project_id, files_dict):
     """
     Background task to process project asynchronously.
+    This runs in a separate thread with proper error handling.
     
     Args:
         project_id: UUID of the project
         files_dict: Dict of {file_path: content}
     """
     try:
+        print(f"\n{'='*60}")
+        print(f"🚀 ASYNC TASK STARTED: {project_id}")
+        print(f"📁 Processing {len(files_dict)} files")
+        print(f"{'='*60}\n")
+        
         # Initialize S3 service for uploads
         s3_service = S3Service()
         
         # Step 1: Analyze code structure (10%)
+        print(f"[1/5] Analyzing code structure...")
         Project.update_status(project_id, 'processing', 10, 'Analyzing code structure...')
         analysis = CodeAnalyzer.analyze_files(files_dict)
+        print(f"[1/5] ✅ Complete")
         
         # Update project with analysis results
         Project.update(
@@ -62,10 +70,12 @@ def process_project_async(project_id, files_dict):
         # Color analysis removed for performance
         
         # Step 2: Generate documentation (40%)
+        print(f"[2/5] Generating documentation...")
         Project.update_status(project_id, 'processing', 40, 'Generating documentation...')
         doc_gen = DocumentationGenerator()
         project = Project.find_by_id(project_id)
         doc_result = doc_gen.generate(project['name'], files_dict)
+        print(f"[2/5] ✅ Documentation generated ({len(doc_result['content'])} chars)")
         
         # Store documentation in database
         # Calculate generation time (handle datetime object from database)
@@ -104,14 +114,16 @@ def process_project_async(project_id, files_dict):
         # ===== DOCUMENTATION IS READY - MARK AS COMPLETED =====
         # User can view documentation NOW while security/quality/embeddings run in background
         Project.update_status(project_id, 'completed', 100, 'Documentation ready')
-        print(f"✅ Documentation completed for project {project_id} - User can view now!")
+        print(f"\n{'='*60}")
+        print(f"✅ DOCUMENTATION COMPLETE - User can view now!")
+        print(f"{'='*60}\n")
         
         # ===== BACKGROUND TASKS (Don't block user) =====
-        # Step 3: Security Analysis (in background - analyzes ALL files)
-        print(f"Starting background security analysis for project {project_id}...")
+        # Step 3: Security Analysis (in background - analyzes top 50 files)
+        print(f"[3/5] Running security analysis (batched)...")
         try:
             sec_analyzer = SecurityAnalyzer()
-            sec_findings = sec_analyzer.analyze_project(files_dict)  # Analyzes ALL files
+            sec_findings = sec_analyzer.analyze_project(files_dict, max_files=50)  # Limit for speed
             
             # Store security findings
             for finding in sec_findings:
@@ -155,15 +167,17 @@ def process_project_async(project_id, files_dict):
                 s3_service.upload_file(temp_sec_path, security_analysis_path)
                 os.unlink(temp_sec_path)
             
-            print(f"✅ Security analysis completed for project {project_id}")
+            print(f"[3/5] ✅ Security analysis complete: {len(sec_findings)} findings")
         except Exception as sec_error:
-            print(f"⚠️ Security analysis failed for {project_id}: {sec_error}")
+            print(f"[3/5] ⚠️ Security analysis failed: {sec_error}")
+            import traceback
+            traceback.print_exc()
         
-        # Step 4: Code Quality Analysis (in background - analyzes ALL files)
-        print(f"Starting background code quality analysis for project {project_id}...")
+        # Step 4: Code Quality Analysis (in background - analyzes top 50 files)
+        print(f"[4/5] Running code quality analysis (batched)...")
         try:
             quality_analyzer = CodeQualityAnalyzer()
-            improvements = quality_analyzer.analyze_project(files_dict)  # Analyzes ALL files
+            improvements = quality_analyzer.analyze_project(files_dict, max_files=50)  # Limit for speed
             
             # Store improvements
             for improvement in improvements:
@@ -196,30 +210,42 @@ def process_project_async(project_id, files_dict):
                 s3_service.upload_file(temp_qual_path, quality_analysis_path)
                 os.unlink(temp_qual_path)
             
-            print(f"✅ Code quality analysis completed for project {project_id}")
+            print(f"[4/5] ✅ Code quality analysis complete: {len(improvements)} improvements")
         except Exception as qual_error:
-            print(f"⚠️ Code quality analysis failed for {project_id}: {qual_error}")
+            print(f"[4/5] ⚠️ Code quality analysis failed: {qual_error}")
+            import traceback
+            traceback.print_exc()
         
         # Step 5: Create embeddings for RAG (in background)
-        print(f"Starting background embedding creation for project {project_id}...")
+        print(f"[5/5] Creating embeddings for chat...")
         try:
             rag_service = RAGService()
             rag_service.reindex_project(project_id, files_dict, doc_result['sections'])
-            print(f"✅ Embeddings completed for project {project_id}")
+            print(f"[5/5] ✅ Embeddings complete")
             Project.update_status(project_id, 'completed', 100, 'All analysis complete - Chat ready!')
         except Exception as embed_error:
-            print(f"⚠️ Embedding creation failed for {project_id}: {embed_error}")
+            print(f"[5/5] ⚠️ Embedding creation failed: {embed_error}")
+            import traceback
+            traceback.print_exc()
             # Don't fail the whole project if embeddings fail - docs are still viewable
             Project.update_status(project_id, 'completed', 100, 'Documentation ready (chat unavailable)')
         
-        print(f"Project {project_id} fully processed")
+        print(f"\n{'='*60}")
+        print(f"✅ ALL PROCESSING COMPLETE: {project_id}")
+        print(f"{'='*60}\n")
     
     except Exception as e:
         import traceback
-        error_details = traceback.format_exc()
-        print(f"Error processing project {project_id}: {e}")
-        print(f"Full traceback:\n{error_details}")
-        Project.update_status(project_id, 'failed', 0, f'Processing failed: {str(e)}')
+        print(f"\n{'='*60}")
+        print(f"❌ CRITICAL ERROR: {project_id}")
+        print(f"Error: {e}")
+        print(f"{'='*60}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        try:
+            Project.update_status(project_id, 'failed', 0, f'Processing failed: {str(e)}')
+        except:
+            print("⚠️ Failed to update project status to 'failed'")
 
 
 @project_bp.route('', methods=['GET'])

@@ -105,124 +105,108 @@ Please provide a detailed analysis."""
         for filename, content in list(code_files.items())[:10]:  # Limit to first 10 files
             code_context += f"\n\n### File: {filename}\n```\n{content[:2000]}\n```"  # Limit content length
         
-        prompt = f"""Generate comprehensive technical documentation for the project '{project_name}'.
+        prompt = f"""Generate concise technical documentation for '{project_name}'.
 
 Code Files:{code_context}
-
-Create complete markdown documentation following this EXACT structure and format:
 
 # {project_name} Documentation
 
 ## Purpose and Objectives
-Write a comprehensive paragraph explaining what this project does, its main purpose, goals, and the problems it solves. Analyze the code structure and functionality to understand the project's objectives.
+What does this project do? What problems does it solve? (2-3 sentences)
 
 ## Setup and Installation
 
 ### Prerequisites and Dependencies
-List all required software, libraries, and tools needed before installation. Include versions if found in package files.
+List required tools and libraries (with versions if available).
 
 ### Installation Instructions
-Provide clear step-by-step instructions for installing the project. Include commands and setup steps.
+Step-by-step installation commands.
 
 ### Configuration Steps
-Explain how to configure the project after installation. Include environment variables, config files, and settings.
+Environment variables and configuration files needed.
 
 ### Environment Setup
-Detail the complete environment setup process including development tools, IDE setup, and system requirements.
+Development environment setup.
 
 ## Architecture Documentation
 
 ### System Architecture and Tech Stack
-Describe the overall system architecture. List all technologies, frameworks, languages, and tools used in the project.
+Technologies, frameworks, and languages used.
 
 ### Component Relationships
-Explain how different components, modules, and services interact with each other. Show the project structure.
+How components interact and project structure.
 
 ### Simple Data Flow
-Describe the data flow through the system. Explain how data moves between components and the request/response cycle.
+How data flows through the system.
 
 ### Database Schemas or Data Models
-Document all database tables, collections, or data structures. Include field names, types, and relationships.
+Database tables and data structures.
 
 ## Code Documentation
 
 ### API Reference and Endpoints
-List all API endpoints with methods (GET, POST, etc.), paths, parameters, request/response examples, and descriptions.
+API endpoints with methods, paths, and descriptions.
 
 ### Function/Method Documentation
-Document key functions and methods including their purpose, parameters, return values, and usage.
+Key functions and their purpose.
 
 ### Code Comments and Inline Documentation
-Explain important code patterns, algorithms, and logic found in the codebase.
+Important code patterns and logic.
 
 ### Usage Examples and Code Samples
-Provide practical code examples showing how to use the main features and functionality.
+Practical usage examples.
 
 ## User Guides
 
 ### Feature Documentation
-List ALL key features of the project with clear descriptions of what each feature does and how it works.
+Key features and how they work.
 
 ### FAQs
-Provide answers to frequently asked questions about using the project, common issues, and best practices.
+Common questions and answers.
 
 ## Development Documentation
 
 ### Coding Standards and Conventions
-Document the coding style, naming conventions, file organization, and development practices used in the project.
+Coding style and practices.
 
 ### Development Workflow
-Explain the development process including branching strategy, code review process, and contribution guidelines.
+Development and contribution process.
 
 ### Testing Procedures
-Describe how to run tests, what testing frameworks are used, and how to write new tests.
+How to run and write tests.
 
 ### Deployment Processes
-Explain how to deploy the project including build steps, deployment platforms, and CI/CD processes.
+Deployment steps and platforms.
 
 ## Maintenance Information
 
 ### Version History and Changelog
-Document version information, recent changes, and update history if available in the code.
+Version info and recent changes.
 
 ### Known Issues and Limitations
-List any known bugs, limitations, or areas needing improvement found in the codebase.
+Known bugs and limitations.
 
 ### Performance Considerations
-Discuss performance aspects including optimization techniques, bottlenecks, and scalability considerations.
+Performance optimization and bottlenecks.
 
 ### Security Considerations
-Document security measures, authentication/authorization, data protection, and security best practices implemented.
-
-## Additional Notes
-Include any other important information that doesn't fit in the above categories but is relevant to users or developers.
+Security measures and best practices.
 
 ## Reference Materials
 
 ### Glossary of Terms
-Define technical terms, acronyms, and domain-specific terminology used in the project.
+Technical terms and acronyms.
 
 ### External Dependencies
-List all third-party libraries, services, and APIs used with their purposes and documentation links.
-
-### Contact Information for Support
-Provide information about where to get help, report issues, or contact the development team.
+Third-party libraries and services.
 
 ---
 
-**IMPORTANT FORMATTING RULES:**
-1. Use ## for main sections (Purpose and Objectives, Setup and Installation, etc.)
-2. Use ### for subsections (Prerequisites and Dependencies, Installation Instructions, etc.)
-3. Use bullet points (-) for lists within subsections
-4. Write in clear, professional technical writing style
-5. Be comprehensive but concise
-6. If information is not available in the code, write "Not specified in codebase" but still create the section
-7. Include code examples in markdown code blocks with language syntax
-8. Make it practical and useful for both users and developers"""
+**Keep it concise! Each section should be 2-5 sentences max. If info isn't in code, write "Not specified in codebase".**"""
         
-        system_message = "You are an expert technical documentation specialist. Generate thorough, professional documentation by analyzing code structure, imports, comments, and patterns. Be comprehensive and detailed."
+        system_message = "You are a technical writer. Generate CONCISE documentation by analyzing code. Be brief and direct."
         
-        return self.generate_completion(prompt, max_tokens=8000)
+        return self.generate_completion(prompt, max_tokens=6000)
     
     def find_security_vulnerabilities(self, code, filename):
         """

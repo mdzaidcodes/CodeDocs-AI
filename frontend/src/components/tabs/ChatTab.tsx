@@ -11,13 +11,14 @@ import type { ChatMessage } from '@/types';
 
 interface ChatTabProps {
   projectId: string;
+  isEmbeddingsReady?: boolean;
 }
 
 /**
  * Chat Tab Component
  * RAG-powered chat assistant for querying documentation
  */
-export default function ChatTab({ projectId }: ChatTabProps) {
+export default function ChatTab({ projectId, isEmbeddingsReady = false }: ChatTabProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -108,6 +109,20 @@ export default function ChatTab({ projectId }: ChatTabProps) {
       handleSendMessage(e);
     }
   };
+
+  // Show loading state while embeddings are being created
+  if (!isEmbeddingsReady) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-6">
+        <Loader2 className="h-16 w-16 text-green-400 animate-spin" />
+        <div className="text-center space-y-2">
+          <p className="text-2xl font-bold text-white">Coming Soon...</p>
+          <p className="text-gray-400">Chat assistant is being prepared in the background</p>
+          <p className="text-sm text-gray-500">This usually takes 30-60 seconds</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-300px)]">

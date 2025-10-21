@@ -86,11 +86,12 @@ export default function ImprovementsTab({ projectId, improvements, isLoading = f
   // Show loading state
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-4">
-        <Loader2 className="h-12 w-12 text-blue-400 animate-spin" />
-        <div className="text-center">
-          <p className="text-xl font-semibold text-white mb-2">Analyzing Code Quality...</p>
-          <p className="text-gray-400">Finding improvement opportunities</p>
+      <div className="flex flex-col items-center justify-center py-24 space-y-6">
+        <Loader2 className="h-16 w-16 text-purple-400 animate-spin" />
+        <div className="text-center space-y-2">
+          <p className="text-2xl font-bold text-white">Coming Soon...</p>
+          <p className="text-gray-400">Code quality analysis is being processed in the background</p>
+          <p className="text-sm text-gray-500">This usually takes 1-2 minutes</p>
         </div>
       </div>
     );
