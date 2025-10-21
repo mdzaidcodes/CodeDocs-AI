@@ -41,13 +41,13 @@ class SecurityAnalyzer:
             print(f"Error analyzing {filename}: {e}")
             return []
     
-    def analyze_project(self, code_files, max_files=None):
+    def analyze_project(self, code_files, max_files=50):
         """
-        Analyze ALL files for security issues.
+        Analyze project files for security issues in batches.
         
         Args:
             code_files: Dict of {file_path: content}
-            max_files: Maximum files to analyze (None = analyze all files)
+            max_files: Maximum files to analyze (default: 50 for performance)
             
         Returns:
             list: Combined list of all findings
@@ -68,23 +68,65 @@ class SecurityAnalyzer:
             reverse=True
         )
         
-        # Apply limit if specified, otherwise analyze all files
-        files_to_analyze = sorted_files[:max_files] if max_files else sorted_files
+        # Limit files for performance (top priority files)
+        files_to_analyze = sorted_files[:max_files]
         
-        print(f"[Security] Analyzing {len(files_to_analyze)} files for vulnerabilities...")
+        print(f"[Security] Analyzing {len(files_to_analyze)} files (batched for performance)...")
         
-        # Analyze files
-        for idx, (file_path, content) in enumerate(files_to_analyze, 1):
-            # Skip very large files (truncate to 10000 chars)
-            if len(content) > 10000:
-                content = content[:10000]
+        # Batch files together - analyze 10 files at a time in one Claude call
+        batch_size = 10
+        for batch_idx in range(0, len(files_to_analyze), batch_size):
+            batch_files = files_to_analyze[batch_idx:batch_idx + batch_size]
             
-            print(f"[Security] ({idx}/{len(files_to_analyze)}) Analyzing {file_path}...")
-            findings = self.analyze_file(file_path, content)
-            all_findings.extend(findings)
+            # Combine files into one context
+            combined_context = ""
+            for file_path, content in batch_files:
+                # Truncate large files
+                truncated_content = content[:5000] if len(content) > 5000 else content
+                combined_context += f"\n\n### File: {file_path}\n```\n{truncated_content}\n```"
+            
+            print(f"[Security] Batch {batch_idx//batch_size + 1}/{(len(files_to_analyze) + batch_size - 1)//batch_size}: Analyzing {len(batch_files)} files...")
+            
+            # Analyze batch with Claude
+            try:
+                findings = self._analyze_batch(combined_context, [f[0] for f in batch_files])
+                all_findings.extend(findings)
+            except Exception as e:
+                print(f"[Security] Batch analysis error: {e}")
         
         print(f"[Security] ✅ Found {len(all_findings)} security issues across {len(files_to_analyze)} files")
         return all_findings
+    
+    def _analyze_batch(self, combined_context, file_paths):
+        """Analyze a batch of files together."""
+        prompt = f"""Analyze these code files for security vulnerabilities:
+
+{combined_context}
+
+Find security issues in ANY of these files and return a JSON array. For each vulnerability:
+
+{{
+  "file_path": "exact path from above",
+  "severity": "critical|high|medium|low|info",
+  "category": "SQL Injection|XSS|Auth|etc",
+  "title": "Brief title",
+  "description": "What's the issue",
+  "line_number": line number or null,
+  "recommendation": "How to fix"
+}}
+
+Return ONLY the JSON array, no other text."""
+
+        try:
+            response = self.claude_service.generate_completion(
+                prompt=prompt,
+                system_message="You are a security expert. Return only valid JSON array.",
+                max_tokens=4000
+            )
+            return self._parse_findings(response)
+        except Exception as e:
+            print(f"Batch analysis error: {e}")
+            return []
     
     def _parse_findings(self, claude_response):
         """
