@@ -11,7 +11,12 @@ class ClaudeService:
     
     def __init__(self):
         """Initialize Claude client with API key."""
-        self.client = Anthropic(api_key=Config.CLAUDE_API_KEY)
+        # Initialize Anthropic client with only API key
+        self.client = Anthropic(
+            api_key=Config.CLAUDE_API_KEY,
+            timeout=300.0,  # 5 minute timeout
+            max_retries=2
+        )
         self.model = Config.CLAUDE_MODEL
         self.max_tokens = Config.CLAUDE_MAX_TOKENS
     

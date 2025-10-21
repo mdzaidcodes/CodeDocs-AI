@@ -15,7 +15,7 @@ PyJWT==2.8.0
 boto3==1.34.10
 
 # AI Services
-anthropic==0.18.1
+anthropic==0.39.0
 openai==1.54.0
 
 # GitHub
