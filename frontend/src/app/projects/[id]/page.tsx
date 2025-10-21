@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Code2, FileText, Shield, Sparkles, MessageSquare, Loader2, Palette } from 'lucide-react';
+import { ArrowLeft, Code2, FileText, Shield, Sparkles, MessageSquare, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { isAuthenticated } from '@/lib/api';
 import apiClient from '@/lib/api';
@@ -12,7 +12,6 @@ import DocumentationTab from '@/components/tabs/DocumentationTab';
 import SecurityTab from '@/components/tabs/SecurityTab';
 import ImprovementsTab from '@/components/tabs/ImprovementsTab';
 import ChatTab from '@/components/tabs/ChatTab';
-import ColorPaletteTab from '@/components/tabs/ColorPaletteTab';
 import type { Project, SecurityFinding, CodeImprovement } from '@/types';
 
 /**
@@ -74,7 +73,8 @@ export default function ProjectDetailPage() {
           try {
             const securityResponse = await apiClient.get(`/projects/${projectId}/security`);
             const findings = securityResponse.data.data.findings || [];
-            if (findings.length > 0 || securityResponse.status === 200) {
+            // Only show notification if there's actual data
+            if (findings.length > 0) {
               setSecurityFindings(findings);
               setSecurityLoading(false);
               setSecurityNotificationShown(true);
@@ -101,6 +101,9 @@ export default function ProjectDetailPage() {
               // Refresh project data to get updated security score
               const projectResponse = await apiClient.get(`/projects/${projectId}`);
               setProject(projectResponse.data.data);
+            } else if (findings.length === 0 && securityResponse.status === 200) {
+              // Data loaded but empty - stop loading
+              setSecurityLoading(false);
             }
           } catch (error) {
             // Security data not ready yet
@@ -112,7 +115,8 @@ export default function ProjectDetailPage() {
           try {
             const improvementsResponse = await apiClient.get(`/projects/${projectId}/improvements`);
             const imps = improvementsResponse.data.data.improvements || [];
-            if (imps.length > 0 || improvementsResponse.status === 200) {
+            // Only show notification if there's actual data
+            if (imps.length > 0) {
               setImprovements(imps);
               setImprovementsLoading(false);
               setImprovementsNotificationShown(true);
@@ -135,6 +139,9 @@ export default function ProjectDetailPage() {
                   });
                 },
               });
+            } else if (imps.length === 0 && improvementsResponse.status === 200) {
+              // Data loaded but empty - stop loading
+              setImprovementsLoading(false);
             }
           } catch (error) {
             // Improvements data not ready yet
@@ -321,14 +328,10 @@ export default function ProjectDetailPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 bg-white/5 border border-white/10">
+          <TabsList className="grid w-full grid-cols-4 bg-white/5 border border-white/10">
             <TabsTrigger value="documentation" className="flex items-center space-x-2">
               <FileText className="h-4 w-4" />
               <span>Documentation</span>
-            </TabsTrigger>
-            <TabsTrigger value="colors" className="flex items-center space-x-2">
-              <Palette className="h-4 w-4" />
-              <span>Colors</span>
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center space-x-2">
               <Shield className="h-4 w-4" />
@@ -358,13 +361,6 @@ export default function ProjectDetailPage() {
           <div className="mt-6">
             <TabsContent value="documentation">
               <DocumentationTab projectId={projectId} documentation={documentation} />
-            </TabsContent>
-
-            <TabsContent value="colors">
-              <ColorPaletteTab 
-                projectId={projectId} 
-                colorPalette={project?.color_palette || null}
-              />
             </TabsContent>
 
             <TabsContent value="security">

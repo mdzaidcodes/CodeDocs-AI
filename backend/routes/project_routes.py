@@ -27,7 +27,7 @@ from services.security_analyzer import SecurityAnalyzer
 from services.code_quality_analyzer import CodeQualityAnalyzer
 from services.rag_service import RAGService
 from services.export_service import ExportService
-from services.color_analyzer import ColorAnalyzer
+# ColorAnalyzer removed for performance
 
 # Create blueprint
 project_bp = Blueprint('projects', __name__, url_prefix='/api/projects')
@@ -59,22 +59,7 @@ def process_project_async(project_id, files_dict):
             file_structure=json.dumps(analysis.get('file_structure', {}))
         )
         
-        # Step 1.5: Analyze color palette (20%)
-        Project.update_status(project_id, 'processing', 20, 'Analyzing color palette...')
-        try:
-            color_analyzer = ColorAnalyzer()
-            project_data = Project.find_by_id(project_id)
-            color_palette = color_analyzer.analyze_colors(files_dict, project_data.get('name', 'Project'))
-            
-            # Store color palette in project
-            Project.update(
-                project_id,
-                color_palette=json.dumps(color_palette)
-            )
-            print(f"✅ Color palette analyzed: {len(color_palette.get('colors', []))} colors found")
-        except Exception as e:
-            print(f"⚠️ Color analysis failed: {e}")
-            # Don't fail the entire process if color analysis fails
+        # Color analysis removed for performance
         
         # Step 2: Generate documentation (40%)
         Project.update_status(project_id, 'processing', 40, 'Generating documentation...')

@@ -350,17 +350,10 @@ export default function DocumentationTab({ projectId, documentation }: Documenta
                   </button>
                   <button
                     onClick={() => handleDownload('docx')}
-                    className="w-full text-left px-4 py-3 hover:bg-white/10 text-white transition-colors flex items-center justify-between"
+                    className="w-full text-left px-4 py-3 hover:bg-white/10 text-white transition-colors flex items-center justify-between rounded-b-lg"
                   >
                     <span>Microsoft Word</span>
                     <span className="text-xs text-gray-400">.docx</span>
-                  </button>
-                  <button
-                    onClick={() => handleDownload('pdf')}
-                    className="w-full text-left px-4 py-3 hover:bg-white/10 text-white transition-colors flex items-center justify-between rounded-b-lg"
-                  >
-                    <span>PDF</span>
-                    <span className="text-xs text-gray-400">.pdf</span>
                   </button>
                 </div>
               )}
