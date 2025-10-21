@@ -7,13 +7,9 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
-# Check if running in production
-# Set ENVIRONMENT=production or USE_SECRETS_MANAGER=true to load from AWS Secrets Manager
-USE_SECRETS_MANAGER = (
-    os.environ.get('ENVIRONMENT', '').lower() in ['production', 'prod'] or
-    os.environ.get('USE_SECRETS_MANAGER', '').lower() == 'true' or
-    os.environ.get('AWS_EXECUTION_ENV') is not None  # Running on AWS
-)
+# Always use AWS Secrets Manager by default
+# Set USE_SECRETS_MANAGER=false to use local .env file instead
+USE_SECRETS_MANAGER = os.environ.get('USE_SECRETS_MANAGER', 'true').lower() != 'false'
 
 if USE_SECRETS_MANAGER:
     # Production: Load secrets from AWS Secrets Manager
