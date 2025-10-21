@@ -184,7 +184,7 @@ export default function DocumentationTab({ projectId, documentation }: Documenta
     setShowDownloadMenu(false);
 
     // Show loading toast
-    const loadingToast = Swal.fire({
+    Swal.fire({
       title: 'Preparing Download',
       text: `Generating ${format.toUpperCase()} file...`,
       icon: 'info',
@@ -233,7 +233,7 @@ export default function DocumentationTab({ projectId, documentation }: Documenta
       window.URL.revokeObjectURL(url);
 
       // Close loading toast and show success
-      loadingToast.close();
+      Swal.close();
       
       Swal.fire({
         title: 'Download Complete!',
@@ -247,10 +247,8 @@ export default function DocumentationTab({ projectId, documentation }: Documenta
       });
 
     } catch (error: any) {
-      console.error('Download error:', error);
-      
       // Close loading toast and show error
-      loadingToast.close();
+      Swal.close();
       
       Swal.fire({
         title: 'Download Failed',

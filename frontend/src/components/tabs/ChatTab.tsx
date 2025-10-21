@@ -77,7 +77,7 @@ export default function ChatTab({ projectId }: ChatTabProps) {
         Swal.fire({
           icon: 'warning',
           title: 'Message Quota Exceeded',
-          html: error.response?.data?.message || "You've reached your daily limit of 5 messages. Your quota will reset tomorrow. Thank you for your understanding!",
+          html: error.response?.data?.message || "You&apos;ve reached your daily limit of 5 messages. Your quota will reset tomorrow. Thank you for your understanding!",
           confirmButtonText: 'Understood',
           confirmButtonColor: '#3b82f6',
           background: '#1e293b',

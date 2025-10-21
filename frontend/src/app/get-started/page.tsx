@@ -81,7 +81,7 @@ export default function GetStartedPage() {
         Swal.fire({
           icon: 'warning',
           title: 'Daily Quota Reached',
-          html: error.response?.data?.message || "You've reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
+          html: error.response?.data?.message || "You&apos;ve reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
           confirmButtonText: 'Understood',
           confirmButtonColor: '#3b82f6',
           background: '#1e293b',
@@ -140,7 +140,7 @@ export default function GetStartedPage() {
         Swal.fire({
           icon: 'warning',
           title: 'Daily Quota Reached',
-          html: error.response?.data?.message || "You've reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
+          html: error.response?.data?.message || "You&apos;ve reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
           confirmButtonText: 'Understood',
           confirmButtonColor: '#3b82f6',
           background: '#1e293b',

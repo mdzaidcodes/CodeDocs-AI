@@ -100,6 +100,7 @@ export default function UploadModal({ isOpen, onClose, onSubmit }: UploadModalPr
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -111,10 +112,10 @@ export default function UploadModal({ isOpen, onClose, onSubmit }: UploadModalPr
         entry.file((file: File) => {
           // Create a new File object with the relative path
           const relativePath = path ? `${path}/${file.name}` : file.name;
-          const fileWithPath = new File([file], file.name, {
+          const fileWithPath = new (File as any)([file], file.name, {
             type: file.type,
             lastModified: file.lastModified,
-          });
+          }) as File;
           // Store relative path as a property
           Object.defineProperty(fileWithPath, 'webkitRelativePath', {
             value: relativePath,
