@@ -18,6 +18,7 @@ from models.project import Project
 from models.documentation import Documentation
 from models.security_finding import SecurityFinding
 from models.code_improvement import CodeImprovement
+from models.user_quota import UserQuota
 from services.s3_service import S3Service
 from services.github_service import GitHubService
 from services.code_analyzer import CodeAnalyzer
@@ -323,12 +324,36 @@ def upload_project(user_id):
     if not file_paths or len(file_paths) != len(files):
         file_paths = [file.filename for file in files]
     
+    # Check daily project creation quota (production only)
+    from config.settings import Config
+    if Config.FLASK_ENV == 'production':
+        has_quota, remaining, reset_time = UserQuota.check_quota_available(user_id)
+        
+        if not has_quota:
+            return jsonify({
+                'success': False,
+                'error': 'Daily quota exceeded',
+                'error_code': 'QUOTA_EXCEEDED',
+                'message': "You've reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
+                'quota_info': {
+                    'max_projects_per_day': 3,
+                    'projects_created_today': 3,
+                    'remaining_quota': 0,
+                    'quota_reset_at': reset_time.isoformat(),
+                    'timezone': 'GMT+4'
+                }
+            }), 429  # 429 Too Many Requests
+    
     # Create project with proper S3 paths
     project = Project.create(
         user_id=user_id,
         name=project_name,
         source_type='upload'
     )
+    
+    # Increment quota counter (production only)
+    if Config.FLASK_ENV == 'production':
+        UserQuota.increment_quota(user_id)
     
     project_id = project['id']
     
@@ -434,6 +459,26 @@ def connect_github(user_id):
     github_branch = data.get('github_branch', 'main')
     github_pat = data.get('github_pat')
     
+    # Check daily project creation quota (production only)
+    from config.settings import Config
+    if Config.FLASK_ENV == 'production':
+        has_quota, remaining, reset_time = UserQuota.check_quota_available(user_id)
+        
+        if not has_quota:
+            return jsonify({
+                'success': False,
+                'error': 'Daily quota exceeded',
+                'error_code': 'QUOTA_EXCEEDED',
+                'message': "You've reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
+                'quota_info': {
+                    'max_projects_per_day': 3,
+                    'projects_created_today': 3,
+                    'remaining_quota': 0,
+                    'quota_reset_at': reset_time.isoformat(),
+                    'timezone': 'GMT+4'
+                }
+            }), 429  # 429 Too Many Requests
+    
     # Create project first
     project = Project.create(
         user_id=user_id,
@@ -442,6 +487,10 @@ def connect_github(user_id):
         github_url=github_url,
         github_branch=github_branch
     )
+    
+    # Increment quota counter (production only)
+    if Config.FLASK_ENV == 'production':
+        UserQuota.increment_quota(user_id)
     
     project_id = project['id']
     
@@ -870,12 +919,108 @@ def chat_with_project(user_id, project_id):
             'error': 'Message is required'
         }), 400
     
+    # Check daily message quota (production only)
+    from config.settings import Config
+    if Config.FLASK_ENV == 'production':
+        has_quota, remaining, reset_time = UserQuota.check_message_quota_available(user_id)
+        
+        if not has_quota:
+            return jsonify({
+                'success': False,
+                'error': 'Message quota exceeded',
+                'error_code': 'MESSAGE_QUOTA_EXCEEDED',
+                'message': "You've reached your daily limit of 5 messages. Your quota will reset tomorrow. Thank you for your understanding!",
+                'quota_info': {
+                    'max_messages_per_day': 5,
+                    'messages_sent_today': 5,
+                    'remaining_quota': 0,
+                    'quota_reset_at': reset_time.isoformat(),
+                    'timezone': 'GMT+4'
+                }
+            }), 429  # 429 Too Many Requests
+    
     # Get answer from RAG service
     rag_service = RAGService()
     response = rag_service.answer_question(project_id, message)
     
+    # Increment message quota counter (production only)
+    if Config.FLASK_ENV == 'production':
+        UserQuota.increment_message_quota(user_id)
+    
     return jsonify({
         'success': True,
         'data': response
+    }), 200
+
+
+@project_bp.route('/quota', methods=['GET'])
+@require_auth
+@handle_errors
+def get_quota_status(user_id):
+    """
+    Get current user's project quota status.
+    
+    GET /api/projects/quota
+    Returns: {success, data: {quota_info}}
+    """
+    from config.settings import Config
+    
+    # In development, always return unlimited quota
+    if Config.FLASK_ENV != 'production':
+        return jsonify({
+            'success': True,
+            'data': {
+                'environment': 'development',
+                'quota_enabled': False,
+                'message': 'Quota limits are disabled in development'
+            }
+        }), 200
+    
+    # Get quota statistics
+    quota_stats = UserQuota.get_quota_stats(user_id)
+    
+    return jsonify({
+        'success': True,
+        'data': {
+            'environment': 'production',
+            'quota_enabled': True,
+            **quota_stats
+        }
+    }), 200
+
+
+@project_bp.route('/chat/quota', methods=['GET'])
+@require_auth
+@handle_errors
+def get_message_quota_status(user_id):
+    """
+    Get current user's message quota status.
+    
+    GET /api/projects/chat/quota
+    Returns: {success, data: {quota_info}}
+    """
+    from config.settings import Config
+    
+    # In development, always return unlimited quota
+    if Config.FLASK_ENV != 'production':
+        return jsonify({
+            'success': True,
+            'data': {
+                'environment': 'development',
+                'quota_enabled': False,
+                'message': 'Message quota limits are disabled in development'
+            }
+        }), 200
+    
+    # Get message quota statistics
+    quota_stats = UserQuota.get_message_quota_stats(user_id)
+    
+    return jsonify({
+        'success': True,
+        'data': {
+            'environment': 'production',
+            'quota_enabled': True,
+            **quota_stats
+        }
     }), 200
 

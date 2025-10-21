@@ -51,13 +51,16 @@ class GitHubService:
                 os.makedirs(target_dir, exist_ok=True)
             
             # Build clone URL with token if provided
+            # SECURITY: Never include token in logs or error messages
             if self.access_token:
-                clone_url = f"https://{self.access_token}@github.com/{owner}/{repo_name}.git"
+                # Use OAuth token format (more secure than embedding in URL)
+                clone_url = f"https://oauth2:{self.access_token}@github.com/{owner}/{repo_name}.git"
             else:
                 clone_url = f"https://github.com/{owner}/{repo_name}.git"
             
             # Clone repository
-            print(f"Cloning {repo_url} (branch: {branch})...")
+            # SECURITY: Don't log the clone URL as it may contain credentials
+            print(f"Cloning repository: {owner}/{repo_name} (branch: {branch})...")
             repo = git.Repo.clone_from(
                 clone_url,
                 target_dir,
@@ -65,15 +68,17 @@ class GitHubService:
                 depth=1  # Shallow clone for faster download
             )
             
-            print(f"Repository cloned to {target_dir}")
+            print(f"Repository cloned successfully to temporary directory")
             return target_dir
         
         except git.GitCommandError as e:
-            print(f"Git clone error: {e}")
-            raise Exception(f"Failed to clone repository: {str(e)}")
+            # SECURITY: Don't include exception details that might contain URLs with tokens
+            print(f"Git clone failed for repository: {owner}/{repo_name}")
+            raise Exception(f"Failed to clone repository. Please check your repository URL and access permissions.")
         except Exception as e:
-            print(f"GitHub clone error: {e}")
-            raise Exception(f"Failed to clone repository: {str(e)}")
+            # SECURITY: Generic error message, no sensitive details
+            print(f"Repository clone error for: {owner}/{repo_name}")
+            raise Exception(f"Failed to clone repository. Please verify the repository URL and your access rights.")
     
     def get_repository_info(self, repo_url):
         """

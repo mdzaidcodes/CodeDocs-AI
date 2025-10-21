@@ -75,12 +75,26 @@ export default function GetStartedPage() {
       pollProjectStatus(projectId);
     } catch (error: any) {
       console.error('Upload error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Upload Failed',
-        text: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to upload files',
-        confirmButtonColor: '#3b82f6',
-      });
+      
+      // Check if it's a quota exceeded error
+      if (error.response?.status === 429 || error.response?.data?.error_code === 'QUOTA_EXCEEDED') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Daily Quota Reached',
+          html: error.response?.data?.message || "You've reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
+          confirmButtonText: 'Understood',
+          confirmButtonColor: '#3b82f6',
+          background: '#1e293b',
+          color: '#fff',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to upload files',
+          confirmButtonColor: '#3b82f6',
+        });
+      }
     }
   };
 
@@ -120,12 +134,26 @@ export default function GetStartedPage() {
       pollProjectStatus(projectId);
     } catch (error: any) {
       console.error('GitHub connection error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Connection Failed',
-        text: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to connect to GitHub repository',
-        confirmButtonColor: '#3b82f6',
-      });
+      
+      // Check if it's a quota exceeded error
+      if (error.response?.status === 429 || error.response?.data?.error_code === 'QUOTA_EXCEEDED') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Daily Quota Reached',
+          html: error.response?.data?.message || "You've reached your limit of 3 projects for today. Your quota will reset tomorrow. Thank you for your patience!",
+          confirmButtonText: 'Understood',
+          confirmButtonColor: '#3b82f6',
+          background: '#1e293b',
+          color: '#fff',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Connection Failed',
+          text: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to connect to GitHub repository',
+          confirmButtonColor: '#3b82f6',
+        });
+      }
     }
   };
 

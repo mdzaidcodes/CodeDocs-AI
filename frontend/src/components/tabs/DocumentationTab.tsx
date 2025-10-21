@@ -269,12 +269,9 @@ export default function DocumentationTab({ projectId, documentation }: Documenta
    * Scroll to heading
    */
   const scrollToHeading = (id: string) => {
-    console.log('Scrolling to:', id);
     const element = document.getElementById(id);
     
     if (element) {
-      console.log('Element found:', element);
-      
       // Scroll the entire page to the element
       element.scrollIntoView({ 
         behavior: 'smooth', 

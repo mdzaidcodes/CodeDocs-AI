@@ -102,7 +102,7 @@ export default function ProjectDetailPage() {
               setProject(projectResponse.data.data);
             }
           } catch (error) {
-            console.log('Security data not ready yet');
+            // Security data not ready yet
           }
         }
 
@@ -136,7 +136,7 @@ export default function ProjectDetailPage() {
               });
             }
           } catch (error) {
-            console.log('Improvements data not ready yet');
+            // Improvements data not ready yet
           }
         }
 
@@ -191,14 +191,12 @@ export default function ProjectDetailPage() {
         
         // If no findings and project is completed, analysis might still be running
         if (findings.length === 0 && projectResponse.data.data.status === 'completed') {
-          console.log('No security findings yet, will poll for updates');
           setSecurityLoading(true);
         }
       } catch (error: any) {
         console.error('Error fetching security findings:', error);
         // If 404 or empty response and project is completed, analysis is in progress
         if (projectResponse.data.data.status === 'completed') {
-          console.log('Security data not ready, setting loading state');
           setSecurityLoading(true);
         }
       }
@@ -212,14 +210,12 @@ export default function ProjectDetailPage() {
         
         // If no improvements and project is completed, analysis might still be running
         if (imps.length === 0 && projectResponse.data.data.status === 'completed') {
-          console.log('No improvements yet, will poll for updates');
           setImprovementsLoading(true);
         }
       } catch (error: any) {
         console.error('Error fetching improvements:', error);
         // If 404 or empty response and project is completed, analysis is in progress
         if (projectResponse.data.data.status === 'completed') {
-          console.log('Improvements data not ready, setting loading state');
           setImprovementsLoading(true);
         }
       }

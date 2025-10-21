@@ -5,6 +5,7 @@ import { Send, Bot, User, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import ReactMarkdown from 'react-markdown';
+import Swal from 'sweetalert2';
 import apiClient from '@/lib/api';
 import type { ChatMessage } from '@/types';
 
@@ -67,15 +68,32 @@ export default function ChatTab({ projectId }: ChatTabProps) {
     } catch (error: any) {
       console.error('Chat error:', error);
       
-      // Add error message
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
-        timestamp: new Date().toISOString(),
-      };
+      // Check if it's a message quota exceeded error
+      if (error.response?.status === 429 || error.response?.data?.error_code === 'MESSAGE_QUOTA_EXCEEDED') {
+        // Remove the user message since it wasn't processed
+        setMessages((prev) => prev.slice(0, -1));
+        
+        // Show quota exceeded alert
+        Swal.fire({
+          icon: 'warning',
+          title: 'Message Quota Exceeded',
+          html: error.response?.data?.message || "You've reached your daily limit of 5 messages. Your quota will reset tomorrow. Thank you for your understanding!",
+          confirmButtonText: 'Understood',
+          confirmButtonColor: '#3b82f6',
+          background: '#1e293b',
+          color: '#fff',
+        });
+      } else {
+        // Add error message to chat for other errors
+        const errorMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+          timestamp: new Date().toISOString(),
+        };
 
-      setMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) => [...prev, errorMessage]);
+      }
     } finally {
       setIsLoading(false);
     }

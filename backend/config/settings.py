@@ -87,9 +87,21 @@ class Config:
     # CORS settings
     FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
     FRONTEND_URL_PROD = os.getenv('FRONTEND_URL_PROD', '')
+    
+    # Build CORS origins list
     CORS_ORIGINS = [FRONTEND_URL]
+    
+    # Add production frontend URL if specified
     if FRONTEND_URL_PROD:
         CORS_ORIGINS.append(FRONTEND_URL_PROD)
+    
+    # Add Vercel preview URLs (for deployment previews)
+    if os.getenv('ALLOW_VERCEL_PREVIEWS', 'true').lower() == 'true':
+        CORS_ORIGINS.append('https://*.vercel.app')
+    
+    # Allow all origins in development (for testing)
+    if FLASK_ENV == 'development' and os.getenv('CORS_ALLOW_ALL', 'false').lower() == 'true':
+        CORS_ORIGINS = ['*']
     
     # File upload settings
     MAX_CONTENT_LENGTH = 500 * 1024 * 1024  # 500MB max total upload

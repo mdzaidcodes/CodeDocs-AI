@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Code2, Mail, Lock, User } from 'lucide-react';
+import { Code2, Mail, Lock, User, Check, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import apiClient from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,55 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  /**
+   * Calculate password strength based on requirements
+   * Requirements: 12+ chars, 1 uppercase, 1 special symbol
+   */
+  const passwordStrength = useMemo(() => {
+    const password = formData.password;
+    
+    if (!password) {
+      return { score: 0, label: '', color: '', checks: [] };
+    }
+
+    const checks = [
+      {
+        label: 'At least 12 characters',
+        passed: password.length >= 12,
+      },
+      {
+        label: 'One uppercase letter',
+        passed: /[A-Z]/.test(password),
+      },
+      {
+        label: 'One special symbol (!@#$%^&* etc.)',
+        passed: /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;/`~]/.test(password),
+      },
+    ];
+
+    const passedCount = checks.filter((c) => c.passed).length;
+    const score = (passedCount / checks.length) * 100;
+
+    let label = '';
+    let color = '';
+
+    if (score === 0) {
+      label = '';
+      color = '';
+    } else if (score < 50) {
+      label = 'Weak';
+      color = 'text-red-400';
+    } else if (score < 100) {
+      label = 'Fair';
+      color = 'text-yellow-400';
+    } else {
+      label = 'Strong';
+      color = 'text-green-400';
+    }
+
+    return { score, label, color, checks };
+  }, [formData.password]);
 
   /**
    * Handle input change
@@ -64,12 +113,17 @@ export default function RegisterPage() {
       return;
     }
 
-    // Validate password length
-    if (formData.password.length < 6) {
+    // Validate password strength (all requirements must be met)
+    if (passwordStrength.score < 100) {
+      const failedChecks = passwordStrength.checks
+        .filter((check) => !check.passed)
+        .map((check) => check.label)
+        .join(', ');
+      
       Swal.fire({
         icon: 'error',
-        title: 'Weak Password',
-        text: 'Password must be at least 6 characters',
+        title: 'Password Requirements Not Met',
+        text: `Your password must include: ${failedChecks}`,
         confirmButtonColor: '#3b82f6',
       });
       return;
@@ -222,6 +276,48 @@ export default function RegisterPage() {
                   required
                 />
               </div>
+              
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="space-y-2 mt-3">
+                  {/* Strength Bar */}
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${
+                          passwordStrength.score < 50
+                            ? 'bg-red-500'
+                            : passwordStrength.score < 100
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                        }`}
+                        style={{ width: `${passwordStrength.score}%` }}
+                      />
+                    </div>
+                    {passwordStrength.label && (
+                      <span className={`text-sm font-medium ${passwordStrength.color}`}>
+                        {passwordStrength.label}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Requirements Checklist */}
+                  <div className="space-y-1">
+                    {passwordStrength.checks.map((check, index) => (
+                      <div key={index} className="flex items-center space-x-2 text-xs">
+                        {check.passed ? (
+                          <Check className="h-4 w-4 text-green-400" />
+                        ) : (
+                          <X className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className={check.passed ? 'text-green-400' : 'text-gray-400'}>
+                          {check.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password Field */}

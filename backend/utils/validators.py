@@ -27,6 +27,7 @@ def validate_email(email):
 def validate_password(password):
     """
     Validate password strength.
+    Requires: 12+ characters, 1 uppercase letter, 1 special symbol
     
     Args:
         password: Password string
@@ -37,8 +38,16 @@ def validate_password(password):
     if not password:
         return False, "Password is required"
     
-    if len(password) < 6:
-        return False, "Password must be at least 6 characters long"
+    if len(password) < 12:
+        return False, "Password must be at least 12 characters long"
+    
+    # Check for at least one uppercase letter
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain at least one uppercase letter"
+    
+    # Check for at least one special symbol
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;/`~]', password):
+        return False, "Password must contain at least one special symbol (!@#$%^&* etc.)"
     
     return True, None
 
