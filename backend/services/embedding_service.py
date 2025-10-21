@@ -11,7 +11,12 @@ class EmbeddingService:
     
     def __init__(self):
         """Initialize OpenAI client."""
-        self.client = OpenAI(api_key=Config.OPENAI_API_KEY)
+        # Initialize OpenAI client with only API key (no proxies)
+        self.client = OpenAI(
+            api_key=Config.OPENAI_API_KEY,
+            timeout=60.0,  # 60 second timeout
+            max_retries=2
+        )
         self.model = Config.OPENAI_EMBEDDING_MODEL
     
     def create_embedding(self, text):
